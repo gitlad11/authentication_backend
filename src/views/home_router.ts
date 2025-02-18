@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { authenticateUser, authUsers, createUser, deleteUser, getUsers } from "../controllers/user_controller";
+import { createLink, deleteLink, getLink, getLinks, onDecrypLink } from "../controllers/link_controller";
 
 
 export const routes = (app: express.Application) => {
@@ -41,6 +42,33 @@ export const routes = (app: express.Application) => {
       res.json(users);
     });
 
+    router.post('/link', async (req: Request, res: Response) => {
+      let links;
+      links = await createLink(req.body.url, req.body.expiresAt, req.body.password)
+      res.send(links)
+    });
+
+    router.get("/links", async (req: Request, res: Response) => {
+      let links;
+      links = await getLinks();
+      res.json(links);
+    });
+
+    router.get("/link", async (req: Request, res: Response) => {
+      let links;
+      links = await getLink(req.query);
+      res.json(links);
+    });
+
+    router.post('/link-decr', async (req: Request, res: Response) => {
+      let link = await onDecrypLink(req.body.url, req.body.password)
+      res.json(link);
+    })
+
+    router.delete('/links', async (req: Request, res: Response) => {
+      let user = await deleteLink(req.query.id?.toString())
+      res.json(user);
+    });
 
     app.use(router)
 }
